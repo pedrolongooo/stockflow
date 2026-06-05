@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StockFlow — Gerenciamento de Estoque</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header>
+  <div class="logo">Stock<span class="logo-dot">Flow</span></div>
+  <div class="header-stats">
+    <div class="stat">
+      <div class="stat-value" id="stat-total">0</div>
+      <div class="stat-label">Produtos</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="stat-low">0</div>
+      <div class="stat-label">Estoque Baixo</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="stat-value">R$ 0</div>
+      <div class="stat-label">Valor Total</div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- FORMULÁRIO ADICIONAR -->
+  <div class="section-title">➕ Novo Produto</div>
+  <div class="form-card">
+    <div class="form-grid">
+      <div>
+        <label for="inp-nome">Nome do Produto</label>
+        <input id="inp-nome" type="text" placeholder="Ex: Notebook Dell Inspiron" />
+      </div>
+      <div>
+        <label for="inp-categoria">Categoria</label>
+        <select id="inp-categoria">
+          <option value="eletronicos">Eletrônicos</option>
+          <option value="alimentacao">Alimentação</option>
+          <option value="vestuario">Vestuário</option>
+          <option value="ferramentas">Ferramentas</option>
+          <option value="outros">Outros</option>
+        </select>
+      </div>
+      <div>
+        <label for="inp-qtd">Quantidade</label>
+        <input id="inp-qtd" type="number" min="0" placeholder="0" />
+      </div>
+      <div>
+        <label for="inp-preco">Preço (R$)</label>
+        <input id="inp-preco" type="number" min="0" step="0.01" placeholder="0,00" />
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" id="btn-limpar">Limpar</button>
+      <button class="btn btn-primary" id="btn-adicionar">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+        Adicionar Produto
+      </button>
+    </div>
+  </div>
+
+  <!-- TOOLBAR DE BUSCA E FILTRO -->
+  <div class="toolbar">
+    <div class="section-title" style="margin:0">📦 Estoque</div>
+    <div class="search-wrap">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input id="search" type="text" placeholder="Buscar produto..." />
+    </div>
+    <div class="filter-wrap">
+      <select id="filtro-cat">
+        <option value="">Todas as categorias</option>
+        <option value="eletronicos">Eletrônicos</option>
+        <option value="alimentacao">Alimentação</option>
+        <option value="vestuario">Vestuário</option>
+        <option value="ferramentas">Ferramentas</option>
+        <option value="outros">Outros</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- TABELA DE PRODUTOS -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Categoria</th>
+          <th>Qtd.</th>
+          <th>Preço Unit.</th>
+          <th>Valor Total</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-body"></tbody>
+    </table>
+    <div class="empty" id="empty-state" style="display:none">
+      <div class="empty-icon">📭</div>
+      <p>Nenhum produto encontrado.</p>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL EDITAR -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>✏️ Editar Produto</h3>
+    <div class="form-grid">
+      <div class="full">
+        <label for="edit-nome">Nome do Produto</label>
+        <input id="edit-nome" type="text" />
+      </div>
+      <div>
+        <label for="edit-categoria">Categoria</label>
+        <select id="edit-categoria">
+          <option value="eletronicos">Eletrônicos</option>
+          <option value="alimentacao">Alimentação</option>
+          <option value="vestuario">Vestuário</option>
+          <option value="ferramentas">Ferramentas</option>
+          <option value="outros">Outros</option>
+        </select>
+      </div>
+      <div>
+        <label for="edit-qtd">Quantidade</label>
+        <input id="edit-qtd" type="number" min="0" />
+      </div>
+      <div class="full">
+        <label for="edit-preco">Preço (R$)</label>
+        <input id="edit-preco" type="number" step="0.01" min="0" />
+      </div>
+    </div>
+    <div class="form-actions" style="margin-top:22px">
+      <button class="btn btn-ghost" id="btn-cancelar-modal">Cancelar</button>
+      <button class="btn btn-primary" id="btn-salvar-edicao">Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST de notificação -->
+<div id="toast"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

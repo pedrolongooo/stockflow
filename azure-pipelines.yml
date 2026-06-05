@@ -1,0 +1,80 @@
+# ──────────────────────────────────────────────────────
+# azure-pipelines.yml — StockFlow CI/CD Pipeline
+# Executa testes e publica imagem Docker
+# ──────────────────────────────────────────────────────
+
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+      - feature/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  NODE_VERSION: '20.x'
+  repositoryName: 'gabrielzmijevski/stockflowimg'
+
+stages:
+
+# ── STAGE 1: TESTES ───────────────────────────────────
+- stage: Testes
+  displayName: '🧪 Rodar Testes Automatizados'
+  jobs:
+  - job: Jest
+    displayName: 'Testes com Jest'
+    steps:
+
+    - task: NodeTool@0
+      displayName: 'Usar Node.js $(NODE_VERSION)'
+      inputs:
+        versionSpec: '$(NODE_VERSION)'
+
+    - script: npm install
+      displayName: 'Instalar dependências'
+
+    - script: |
+        npm test -- --ci --coverage --coverageReporters=cobertura --reporters=default --reporters=jest-junit
+      displayName: 'Executar testes Jest'
+      env:
+        JEST_JUNIT_OUTPUT_DIR: $(System.DefaultWorkingDirectory)/test-results
+        JEST_JUNIT_OUTPUT_NAME: junit.xml
+
+    - task: PublishTestResults@2
+      displayName: 'Publicar resultados dos testes'
+      condition: always()
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '$(System.DefaultWorkingDirectory)/test-results/junit.xml'
+        mergeTestResults: true
+        testRunTitle: 'StockFlow — Testes Unitários'
+
+    - task: PublishCodeCoverageResults@2
+      displayName: 'Publicar cobertura de código'
+      condition: always()
+      inputs:
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml'
+
+
+# ── STAGE 2: DOCKER ───────────────────────────────────
+- stage: Docker
+  displayName: '🐳 Build e Push da Imagem Docker'
+  dependsOn: Testes
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - job: BuildAndPush
+    displayName: 'Build and Push to Docker Hub'
+    steps:
+
+    - task: Docker@2
+      displayName: 'Build and Push to Docker Hub'
+      inputs:
+        containerRegistry: 'dockerHubConn'
+        repository: '$(repositoryName)'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          $(Build.BuildId)
+          latest
